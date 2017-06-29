@@ -1,0 +1,234 @@
+---
+title: "MedStar - Klarus Evaluation Dashboard"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: scroll
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(tidyverse)
+library(feather)
+library(myFunctions)
+```
+
+```{r load_data}
+klarus_calls   <- read_feather("../data/klarus_calls.feather")
+```
+
+```{r functions}
+# Function to create row percents for graphing
+# May want to move to an R script later
+row_percent <- function(df, group, x, ...){
+  group <- enquo(group)
+  x     <- enquo(x)
+  df %>% 
+    group_by(!!group, !!x) %>% 
+    summarise(N = n()) %>% 
+    group_by(!!group) %>% 
+    mutate(CumSum = cumsum(N)) %>% 
+    mutate(
+     Percent = (N / max(CumSum) * 100) %>% round(1)
+    ) 
+}
+```
+
+
+
+
+Sidebar {.sidebar data-width=300}
+===============================================================================
+Our evaluation data contains **`r about_data(klarus_calls)`**
+
+Our evaluation data contains information about **`r klarus_calls$id %>% unique %>% length()`** unique people.
+
+Each person in the data was a Klarus patient with a matching 911 response. In this case matching means that MedStar had a 911 response for the person, and the 911 response took place between a Klarus start of care date and a Klarus end of care date.
+
+Please use the navigation bar (blue bar at the top of the screen) to view:  
+
+1. **Overview** The overview tab shows some basic information about each variable in our data. The information is grouped by transport (whether or not the 911 call resulted in the patient being transported to the hospital).
+
+The dashboard was last updated on `r Sys.Date()`
+
+Overview
+===============================================================================
+
+Count of Transport Row
+-------------------------------------------------------------------------------
+
+### Not Transported to Hospital
+
+```{r}
+n <- table(klarus_calls$transported)[1]
+valueBox(n, color = "#44AF69")
+```
+
+### Transported to Hospital
+
+```{r}
+n <- table(klarus_calls$transported)[2]
+valueBox(n, color = "#DD1C1A")
+```
+
+Overview Row 1
+-------------------------------------------------------------------------------
+
+### Percent male and female show separately for people who were transported to the hospital and people who were not transported to the hospitial.
+
+```{r}
+row_percent(klarus_calls, transported, gender) %>% 
+  ggplot(aes(x = transported, y = Percent)) +
+    geom_bar(aes(fill = gender), stat = "identity", width = 0.5) +
+    coord_flip() +
+    scale_x_discrete("Transported to Hospital") +
+    scale_fill_discrete(name = "Gender") +
+    theme_classic()
+```
+
+### Encounter type
+
+```{r}
+row_percent(klarus_calls, transported, encounter_type) %>% 
+  ggplot(aes(x = transported, y = Percent)) +
+    geom_bar(aes(fill = encounter_type), stat = "identity", width = 0.5) +
+    coord_flip() +
+    scale_x_discrete("Transported to Hospital") +
+    scale_fill_discrete(name = "Encounter Type") +
+    theme_classic()
+```
+
+Overview Row 2
+-------------------------------------------------------------------------------
+
+### Call priority
+
+```{r}
+row_percent(klarus_calls, transported, call_priority) %>% 
+  ggplot(aes(x = transported, y = Percent)) +
+    geom_bar(aes(fill = call_priority), stat = "identity", width = 0.5) +
+    coord_flip() +
+    scale_x_discrete("Transported to Hospital") +
+    scale_fill_discrete(name = "Call Priority") +
+    theme_classic()
+```
+
+### MHP Responded
+
+```{r}
+row_percent(klarus_calls, transported, mhp_responded) %>% 
+  ggplot(aes(x = transported, y = Percent)) +
+    geom_bar(aes(fill = mhp_responded), stat = "identity", width = 0.5) +
+    coord_flip() +
+    scale_x_discrete("Transported to Hospital") +
+    scale_fill_discrete(name = "MHP Responded") +
+    theme_classic()
+```
+
+Overview Row 3
+-------------------------------------------------------------------------------
+
+### MHP On Scene
+
+```{r}
+row_percent(klarus_calls, transported, mhp_on_scene) %>% 
+  ggplot(aes(x = transported, y = Percent)) +
+    geom_bar(aes(fill = mhp_on_scene), stat = "identity", width = 0.5) +
+    coord_flip() +
+    scale_x_discrete("Transported to Hospital") +
+    scale_fill_discrete(name = "MHP On Scene") +
+    theme_classic()
+```
+
+### Vehicle Unit
+
+```{r}
+row_percent(klarus_calls, transported, vehicle_unit) %>% 
+  ggplot(aes(x = transported, y = Percent)) +
+    geom_bar(aes(fill = vehicle_unit), stat = "identity", width = 0.5) +
+    coord_flip() +
+    scale_x_discrete("Transported to Hospital") +
+    scale_fill_discrete(name = "Vehicle Unit") +
+    theme_classic()
+```
+
+Overview Row 4
+-------------------------------------------------------------------------------
+
+### No CCP Available
+
+```{r}
+row_percent(klarus_calls, transported, no_ccp_available) %>% 
+  ggplot(aes(x = transported, y = Percent)) +
+    geom_bar(aes(fill = no_ccp_available), stat = "identity", width = 0.5) +
+    coord_flip() +
+    scale_x_discrete("Transported to Hospital") +
+    scale_fill_discrete(name = "No CPP Available") +
+    theme_classic()
+```
+
+### Requested Transport
+
+```{r}
+row_percent(klarus_calls, transported, requested_transport) %>% 
+  ggplot(aes(x = transported, y = Percent)) +
+    geom_bar(aes(fill = requested_transport), stat = "identity", width = 0.5) +
+    coord_flip() +
+    scale_x_discrete("Transported to Hospital") +
+    scale_fill_discrete(name = "Requested Transport") +
+    theme_classic()
+```
+
+Overview Row 5
+-------------------------------------------------------------------------------
+
+### Client Other Address
+
+```{r}
+row_percent(klarus_calls, transported, client_other_address) %>% 
+  ggplot(aes(x = transported, y = Percent)) +
+    geom_bar(aes(fill = client_other_address), stat = "identity", width = 0.5) +
+    coord_flip() +
+    scale_x_discrete("Transported to Hospital") +
+    scale_fill_discrete(name = "Client Other Address") +
+    theme_classic()
+```
+
+### Crew Transport Prior to CCP
+
+```{r}
+row_percent(klarus_calls, transported, crew_trans_prior_ccp) %>% 
+  ggplot(aes(x = transported, y = Percent)) +
+    geom_bar(aes(fill = crew_trans_prior_ccp), stat = "identity", width = 0.5) +
+    coord_flip() +
+    scale_x_discrete("Transported to Hospital") +
+    scale_fill_discrete(name = "Crew Transport Prior to CCP") +
+    theme_classic()
+```
+
+Overview Row 6
+-------------------------------------------------------------------------------
+
+### CCP Consult Prior to Transport
+
+```{r}
+row_percent(klarus_calls, transported, ccp_consult_prior_trans) %>% 
+  ggplot(aes(x = transported, y = Percent)) +
+    geom_bar(aes(fill = ccp_consult_prior_trans), stat = "identity", width = 0.5) +
+    coord_flip() +
+    scale_x_discrete("Transported to Hospital") +
+    scale_fill_discrete(name = "CCP Consult Prior to Transport") +
+    theme_classic()
+```
+
+### MHP One
+
+```{r}
+row_percent(klarus_calls, transported, mhp_one) %>% 
+  ggplot(aes(x = transported, y = Percent)) +
+    geom_bar(aes(fill = mhp_one), stat = "identity", width = 0.5) +
+    coord_flip() +
+    scale_x_discrete("Transported to Hospital") +
+    scale_fill_discrete(name = "MHP One") +
+    theme_classic()
+```
