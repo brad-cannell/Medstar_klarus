@@ -8,7 +8,7 @@ This is the research repository for the evaluation of the MedStar-Klarus Mobile 
 Table of Contents
 -----------------
 
-1.  [Dashboard](insert%20rawgit%20link%20here). Click on the analysis dashboard link for an overview of all study results in a dashboard format.
+1.  [Dashboard](https://rawgit.com/brad-cannell/Medstar_klarus/master/R%20markdown/dashboard.html). Click on the dashboard link for an overview of all study results in a dashboard format.
 
 2.  [Study objectives](#objectives)
 
@@ -26,6 +26,6 @@ Data cleaning and analysis codes
 </H2>
 For more information about our analysis process and results, please click in the individual code file of interest below:
 
-[Code used for importing data into R](insert%20relative%20link%20here)
+[Code used for importing data into R](/R%20markdown/preprocess_01_import_data.md)
 
-[Code used for data managemet]()
+[Code used for data managemet](/R%20markdown/preprocess_02_clean_data.md)
