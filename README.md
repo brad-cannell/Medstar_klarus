@@ -8,7 +8,7 @@ This is the research repository for the evaluation of the MedStar-Klarus Mobile 
 Table of Contents
 -----------------
 
-1.  [Dashboard](https://rawgit.com/brad-cannell/Medstar_klarus/master/R%20markdown/dashboard.html). Click on the dashboard link for an overview of all study results in a dashboard format.
+1.  [Dashboard](https://cdn.rawgit.com/brad-cannell/Medstar_klarus/778a0b2f/R%20markdown/dashboard.html). Click on the dashboard link for an overview of all study results in a dashboard format.
 
 2.  [Study objectives](#objectives)
 
