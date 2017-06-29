@@ -220,15 +220,3 @@ row_percent(klarus_calls, transported, ccp_consult_prior_trans) %>%
     scale_fill_discrete(name = "CCP Consult Prior to Transport") +
     theme_classic()
 ```
-
-### MHP One
-
-```{r}
-# row_percent(klarus_calls, transported, mhp_one) %>% 
-#   ggplot(aes(x = transported, y = Percent)) +
-#     geom_bar(aes(fill = mhp_one), stat = "identity", width = 0.5) +
-#     coord_flip() +
-#     scale_x_discrete("Transported to Hospital") +
-#     scale_fill_discrete(name = "MHP One") +
-#     theme_classic()
-```
