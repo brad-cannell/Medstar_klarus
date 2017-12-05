@@ -1,0 +1,87 @@
+---
+title: "Difference in Transported"
+date: "Created: 2017-09-12 </br> `r Sys.Date()`"
+output: html_notebook
+---
+
+```{r load_packages, message=FALSE}
+# Load packages
+library(tidyverse)
+library(feather)
+library(writexl)
+```
+
+## Import data
+
+```{r}
+medklar <- read_feather("../data/medklar.feather")
+```
+
+
+Are patients any more or less likely to be transported to the hospital when there is MHP/CCP intervention (on scene)?
+
+* Primary exposure of interest: MHP on scene
+
+* Primary outcome of interest: Transported to hospital
+
+* Current data includes P1, P2, and P3 only
+
+## Plot the data
+
+```{r}
+
+```
+
+## Test for diffence
+
+```{r}
+trans_diff <- medklar %>% 
+  group_by(mhp_on_scene, transported) %>% 
+  summarise(
+    Missing    = is.na(transported) %>% sum(),
+    N          = n()
+  ) %>% 
+  mutate(
+    CumSum     = cumsum(N),
+    prop       = N / max(CumSum),
+    se         = sqrt(prop * (1-prop) / (max(CumSum) - 1)),
+    z          = qnorm(1 - 0.05 / 2),
+    lcl        = prop - z * se,
+    ucl        = prop + z * se,
+    Percent    = prop * 100,
+    `Lower CI` = lcl * 100,
+    `Upper CI` = ucl * 100
+  ) %>% 
+  select(transported, mhp_on_scene, N, Percent,`Lower CI`, `Upper CI`)
+
+trans_diff
+
+# Put this code into R Notes
+# Not exactly the same as Stata (after 4 digits) try SAS.
+# Closely matches SAS as well, but not exactly. Different in CI's at 3rd digit.
+# CI's get wider after accounting for clustering within person.
+```
+
+```{r}
+gmodels::CrossTable(
+  x = medklar$mhp_on_scene,
+  y = medklar$transported,
+  chisq = TRUE
+)
+```
+
+Because some people appear in the data more than once, we need to test for a difference using a method that is robust to non-independence of observations. 
+
+Doing in SAS first...
+
+Export data
+
+```{r}
+write_xlsx(medklar, "/Users/bradcannell/Desktop/medklar.xlsx")
+```
+
+
+
+```{r session_info, echo=FALSE}
+sessionInfo()
+```
