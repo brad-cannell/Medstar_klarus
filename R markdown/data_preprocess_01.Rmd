@@ -9,9 +9,9 @@ Sys.setenv(TZ = "US/Central")
 # Load packages
 library(tidyverse)
 library(readxl)
-library(feather)
 library(bfuncs)
-library(forcats)
+library(janitor)
+library(feather)
 ```
 
 # Import data
@@ -50,6 +50,12 @@ med_klar <- med_klar %>%
     enddate       = excel_numeric_to_date(enddate)
   )
 ```
+
+```{r}
+about_data(med_klar) # 1,639 observations and 39 variables
+```
+
+* A bunch of empty rows were removed.
 
 # Recoding variables
 
