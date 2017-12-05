@@ -1,0 +1,81 @@
+---
+title: "Import and Clean MedStar/Klarus MIH Program Data"
+date: "Created: 2017-05-17 <br> Updated: `r Sys.Date()`"
+output: html_notebook
+---
+
+```{r load_packages, message=FALSE}
+Sys.setenv(TZ = "US/Central")
+# Load packages
+library(tidyverse)
+library(readxl)
+library(feather)
+library(bfuncs)
+library(forcats)
+```
+
+# Import data
+
+* Update 2017-09-12: Received a new data set from MZ.
+
+* Update 2017-10-23: Received a new data set from DP.
+
+* Update 2017-11-01: Received a new data set from DE (secure).
+
+```{r}
+med_klar <- read_excel("../data/Klarus - ICD10 Data report for UNT (corrected).xlsx")
+```
+
+```{r}
+about_data(med_klar) # "2,929 observations and 39 variables"
+```
+
+# General cleaning
+
+* Clean variable names
+
+* Remove empty rows
+
+* Convert date columns from character to date
+
+```{r}
+med_klar <- med_klar %>% 
+  clean_names() %>% 
+  remove_empty_rows() %>% 
+  mutate(
+    referral_date = excel_numeric_to_date(referral_date),
+    startdate     = excel_numeric_to_date(startdate),
+    encounter     = excel_numeric_to_date(encounter),
+    enddate       = as.numeric(enddate),
+    enddate       = excel_numeric_to_date(enddate)
+  )
+```
+
+# Recoding variables
+
+```{r}
+med_klar <- med_klar %>% 
+  mutate(
+    # Recode call priority
+    call_priority_r = fct_collapse(call_priority,
+      "1" = c("1", "P1", "C1"),
+      "2" = c("2", "P2", "C2"),
+      "3" = c("3", "P3", "C3")
+    ),
+    call_priority_r_f = factor(call_priority_r)
+  )
+```
+
+```{r}
+about_data(med_klar) # 1,639 observations and 41 variables
+```
+
+# Save data
+
+```{r}
+write_feather(med_klar, "../data/med_klar.feather")
+```
+
+
+
+
