@@ -11,6 +11,7 @@ library(flexdashboard)
 library(tidyverse)
 library(feather)
 library(myFunctions)
+library(ggrepel)
 ```
 
 ```{r load_data}
@@ -78,21 +79,29 @@ Overview Row 1
 
 ```{r}
 row_percent(klarus_calls, transported, gender) %>% 
-  ggplot(aes(x = transported, y = Percent)) +
+  ggplot(aes(x = transported, y = Percent, label = Percent)) +
     geom_bar(aes(fill = gender), stat = "identity", width = 0.5) +
-    coord_flip() +
+    geom_label(vjust = 2) +
     scale_x_discrete("Transported to Hospital") +
     scale_fill_discrete(name = "Gender") +
     theme_classic()
 ```
 
+```{r}
+ggplot(data = klarus_calls, aes(x = transported, group = gender)) +
+  geom_bar(aes(fill = gender))
+  # geom_bar(aes(fill = gender), position = "fill", width = 0.5)
+```
+
+
+
 ### Encounter type
 
 ```{r}
 row_percent(klarus_calls, transported, encounter_type) %>% 
-  ggplot(aes(x = transported, y = Percent)) +
+  ggplot(aes(x = transported, y = Percent, label = Percent)) +
     geom_bar(aes(fill = encounter_type), stat = "identity", width = 0.5) +
-    coord_flip() +
+    geom_label(postion = "stack") +
     scale_x_discrete("Transported to Hospital") +
     scale_fill_discrete(name = "Encounter Type") +
     theme_classic()
