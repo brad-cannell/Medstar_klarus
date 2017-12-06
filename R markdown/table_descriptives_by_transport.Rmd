@@ -1,0 +1,149 @@
+---
+title: "Comparing the characteristics of responses that resulted in a hospital transport to those that did not. Results from MedStar/Klarus MIH Program Data."
+date: "Created: 2017-12-05 <br> Updated: `r Sys.Date()`"
+output:
+  word_document:
+    reference_docx: word_style_template_01.docx
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(comment = NA)
+Sys.setenv(TZ = "US/Central")
+```
+
+```{r load_packages, message=FALSE, echo=FALSE}
+library(tidyverse)
+library(feather)
+library(bfuncs)
+```
+
+```{r echo=FALSE}
+med_klar <- read_feather("../data/med_klar.feather")
+# Created in data_preprocess_01.Rmd
+```
+
+All encounters used in this report where dated between `r min(med_klar$encounter)` and `r max(med_klar$encounter)`
+
+# Analysis of transported
+
+```{r echo=FALSE}
+med_klar %>% 
+  group_by(transported) %>% 
+  freq_table()
+```
+
+The data includes information about 1,639 encounters. Overall, 999 (39%) encounters resulted in a transport and 640 (61%) did not.
+
+```{r echo=FALSE}
+med_klar %>% 
+  group_by(mhp_on_scene, transported) %>% 
+  freq_table()
+```
+
+At 83% of the encounters where there was no MHP on scene, the patient was transported to the hospital. Conversely, at 46% of the encounters where there was an MHP on scene, the patient was transported to the hospital.
+
+# Table. Comparing the characteristics of responses that resulted in a hospital transport to those that did not.
+
+```{r echo=FALSE}
+# Create table shell
+table <- tibble(
+  variable = "",
+  class    = "",
+  no_trans = med_klar %>% bfuncs::get_group_n(transported == "No"),
+  trans    = med_klar %>% bfuncs::get_group_n(transported == "Yes")
+)
+
+
+# Add statistics to column header
+table <- bind_rows(
+  table,
+  tibble(
+    variable = "",
+    class    = "",
+    no_trans = "n (Column %)",
+    trans    = "n (Column %)"
+  )
+)
+
+
+# Select variables
+# ----------------
+cat_vars  <- quos(mhp_on_scene, call_priority_r_f, encounter_type, ems_encounter_outcome)
+
+
+# Fill in categorical variables
+# -----------------------------
+for (i in seq_along(cat_vars)) {
+  
+  # Calculate mean and 95% CI
+  row <- med_klar %>% 
+    group_by(transported, !!cat_vars[[i]]) %>% 
+    freq_table() %>% 
+    format_table(stats = "n and row percent") %>% 
+    spread(key = transported, value = n_percent_row) %>% 
+    mutate(variable = colnames(.)[1]) %>% 
+    rename("class" = !!cat_vars[[i]], "no_trans" = `No`, "trans" = `Yes`) %>% 
+    mutate(class = as.character(class)) # Need for bind_rows below
+  
+  # Append to bottom of table
+  # Add a blank row after each variable
+  # Blank lines mess up kable
+  # blank_row <- tibble(
+  #   variable = "",
+  #   class    = "",
+  #   no_trans = "",
+  #   trans    = ""
+  # )
+  # 
+  # if (i == 1) { # No blank betwee column header and first variable
+  #   table <- bind_rows(table, row) 
+  # } else {
+  #   table <- bind_rows(table, blank_row, row)
+  # }
+  table <- bind_rows(table, row)
+}
+
+
+# Improve row headers
+# -------------------
+table <- table %>%
+  mutate(
+    variable = if_else(variable == "mhp_on_scene", "MHP on scene", variable),
+    variable = if_else(variable == "call_priority_r_f", "Call priority", variable),
+    variable = if_else(variable == "encounter_type", "Encounter type", variable),
+    variable = if_else(variable == "ems_encounter_outcome", "Encounter outcome", variable)
+  )
+
+# Remove duplicate variable names for categorical variables
+table <- table %>%
+  group_by(variable) %>%
+  mutate(
+    x = duplicated(variable),
+    x = if_else(variable == "", NA, x)
+  ) %>%
+  ungroup() %>%
+  mutate(
+    variable = if_else(x == TRUE, "", variable),
+    variable = if_else(is.na(variable), "", variable),
+    x = NULL
+  )
+```
+
+```{r echo=FALSE}
+# Knit to Kable
+table_kable <- knitr::kable(table, col.names = c(
+  "Characteristic",
+  "Class",
+  "Not Transported", 
+  "Transported")
+)
+
+table_kable
+```
+
+
+
+
+
+
+
