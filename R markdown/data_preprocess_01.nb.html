@@ -298,9 +298,12 @@ library(feather)</code></pre>
 <h1>Export to csv for double-checking in SAS</h1>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucmVhZHI6OndyaXRlX2NzdihtZWRfa2xhciwgXCIuLi9kYXRhL21lZF9rbGFyLmNzdlwiKVxuYGBgIn0= -->
-<pre class="r"><code>readr::write_csv(med_klar, &quot;../data/med_klar.csv&quot;)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud3JpdGV4bDo6d3JpdGVfeGxzeChtZWRfa2xhciwgXCIuLi9kYXRhL21lZF9rbGFyLnhsc3hcIilcbmBgYCJ9 -->
+<pre class="r"><code>writexl::write_xlsx(med_klar, &quot;../data/med_klar.xlsx&quot;)</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiLi4vZGF0YS9tZWRfa2xhci54bHN4XCJcbiJ9 -->
+<pre><code>[1] &quot;../data/med_klar.xlsx&quot;</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
