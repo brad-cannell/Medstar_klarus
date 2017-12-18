@@ -82,6 +82,11 @@ about_data(med_klar) # 1,639 observations and 41 variables
 write_feather(med_klar, "../data/med_klar.feather")
 ```
 
+# Export to csv for double-checking in SAS
+
+```{r}
+readr::write_csv(med_klar, "../data/med_klar.csv")
+```
 
 
 
