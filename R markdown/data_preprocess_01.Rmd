@@ -85,7 +85,7 @@ write_feather(med_klar, "../data/med_klar.feather")
 # Export to csv for double-checking in SAS
 
 ```{r}
-readr::write_csv(med_klar, "../data/med_klar.csv")
+writexl::write_xlsx(med_klar, "../data/med_klar.xlsx")
 ```
 
 
